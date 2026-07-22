@@ -1,0 +1,44 @@
+{
+  "name": "kontex-editor",
+  "version": "0.1.0",
+  "description": "Lightweight, embeddable rich-text editor built on TipTap. A leaner CKEditor 5 replacement.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/kontex-editor.umd.cjs",
+  "module": "./dist/kontex-editor.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/kontex-editor.js",
+      "require": "./dist/kontex-editor.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.27.1",
+    "@tiptap/extension-highlight": "^3.27.1",
+    "@tiptap/extension-image": "^3.27.1",
+    "@tiptap/extension-subscript": "^3.27.1",
+    "@tiptap/extension-superscript": "^3.27.1",
+    "@tiptap/extension-table": "^3.27.1",
+    "@tiptap/extension-text-align": "^3.27.1",
+    "@tiptap/extension-text-style": "^3.27.1",
+    "@tiptap/extensions": "^3.27.1",
+    "@tiptap/pm": "^3.27.1",
+    "@tiptap/starter-kit": "^3.27.1",
+    "nspell": "^2.1.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}

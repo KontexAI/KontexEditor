@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KontexEditor — Feature Demo</title>
+    <!--
+      Loads the built UMD bundle. Run `npm run build` first, then open this file
+      directly, or serve the folder (e.g. `npm run dev` → http://localhost:5173/demo.html).
+    -->
+    <style>
+      :root { --muted: #6b7280; }
+      * { box-sizing: border-box; }
+      body {
+        font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #1a1a1a; margin: 0; background: #f4f6f8;
+      }
+      .page { max-width: 880px; margin: 0 auto; padding: 28px 20px 80px; }
+      header h1 { margin: 0 0 4px; font-size: 28px; }
+      header p { margin: 0 0 24px; color: var(--muted); }
+      .section { margin-top: 36px; }
+      .section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 4px; }
+      .section .desc { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+      .section .desc code { background: #e8ebee; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+      .editor-host { background: #fff; border-radius: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>KontexEditor</h1>
+        <p>A lightweight, embeddable rich-text editor — the same core, two configurations.</p>
+      </header>
+
+      <section class="section">
+        <h2>Full editor</h2>
+        <p class="desc">The complete toolbar with every feature enabled — the default setup.</p>
+        <div class="editor-host"><div id="editor"></div></div>
+      </section>
+
+      <section class="section">
+        <h2>Minimal editor</h2>
+        <p class="desc">The same editor with a trimmed <code>toolbar</code> — fully customizable.</p>
+        <div class="editor-host"><div id="editor-min"></div></div>
+      </section>
+    </div>
+
+    <script src="https://betamsg.carecoll.com/static/mail/kontex-editor.umd.cjs"></script>
+    <script>
+      const DEMO_HTML = `
+        <h1 style="text-align: center">📝 Welcome to KontexEditor</h1>
+        <p style="text-align: center"><span style="color: rgb(107, 114, 128)">A leaner, CKEditor-style editor built on TipTap — everything below is editable.</span></p>
+        <hr>
+        <h2>Rich text &amp; inline formatting</h2>
+        <p>You get <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strikethrough</s>,
+          <span style="color: rgb(230, 0, 0)">colored text</span>,
+          <mark data-color="#fff3a3" style="background-color: rgb(255, 243, 163)">highlights</mark>,
+          <code>inline code</code>, and even <sub>sub</sub>/<sup>super</sup>script — e.g. H<sub>2</sub>O and E = mc<sup>2</sup>.</p>
+        <p><span style="font-family: Georgia, serif">A different font family,</span>
+          <span style="font-size: 20px">a larger size,</span> and a
+          <a href="https://tiptap.dev" target="_blank" rel="noopener noreferrer">link (hover me)</a>.</p>
+
+        <h2>Lists, quotes &amp; alignment</h2>
+        <ul>
+          <li>Bullet lists</li>
+          <li>with multiple items</li>
+        </ul>
+        <ol>
+          <li>Ordered lists too</li>
+          <li>auto-numbered</li>
+        </ol>
+        <blockquote><p>“Blockquotes look like this — great for callouts and citations.”</p></blockquote>
+        <p style="text-align: right">This paragraph is right-aligned.</p>
+
+        <h2>Tables (resizable)</h2>
+        <table>
+          <tbody>
+            <tr><th>Feature</th><th>Supported</th><th>Notes</th></tr>
+            <tr><td>Column &amp; row resize</td><td>Yes</td><td>Drag the borders</td></tr>
+            <tr><td>Floating controls</td><td>Yes</td><td>Add/remove rows &amp; columns</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Images with captions</h2>
+        <figure class="kontex-figure">
+          <img src="https://placehold.co/520x220/2563eb/ffffff?text=Resizable+Image" width="520">
+          <figcaption>Drag the corner handle to resize · click here to edit the caption</figcaption>
+        </figure>
+
+        <h2>Media embeds</h2>
+        <p>Use the toolbar to embed a YouTube/Vimeo URL or any iframe — it becomes a responsive player.</p>
+        <p>Happy editing! ✨</p>
+      `;
+
+      KontexEditor.create('#editor', {
+        content: DEMO_HTML,
+        placeholder: 'Start typing…',
+        autosave: { key: 'kontex-feature-demo', debounceMs: 600, restore: true },
+        upload: (file) => Promise.resolve(URL.createObjectURL(file)), // demo: local blob URLs
+        templates: [
+          { title: 'Meeting notes', description: 'Heading + agenda', html: '<h2>Meeting notes</h2><p><strong>Date:</strong> </p><ul><li>Agenda item</li></ul>' },
+          { title: 'Call to action', description: 'Promo block', html: '<h2>Ready to start?</h2><p><a href="#">Get in touch →</a></p>' },
+          { title: 'Signature', html: '<p>Best regards,<br>The Team</p>' },
+        ],
+      }).then((editor) => {
+        window.editor = editor; // for console tinkering
+      });
+
+      // A minimal, customized instance — just a few toolbar items.
+      KontexEditor.create('#editor-min', {
+        content: '<p>Just the essentials. Pass a <code>toolbar</code> array to show only the tools you need.</p><p>Try <strong>bold</strong>, a bullet list, or a link.</p>',
+        placeholder: 'Write something…',
+        toolbar: ['bold', 'italic', 'underline', '|', 'bulletList', 'orderedList', '|', 'link', '|', 'undo', 'redo'],
+      }).then((editor) => {
+        window.editorMin = editor;
+      });
+    </script>
+  </body>
+</html>
