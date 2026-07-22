@@ -3,47 +3,260 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KontexEditor — Feature Demo</title>
-    <!--
-      Loads the built UMD bundle. Run `npm run build` first, then open this file
-      directly, or serve the folder (e.g. `npm run dev` → http://localhost:5173/demo.html).
-    -->
+    <title>KontexEditor — Lightweight embeddable rich-text editor</title>
+    <meta name="description" content="A lightweight, embeddable rich-text editor with a CKEditor-style UX, built on TipTap. Live demo." />
     <style>
-      :root { --muted: #6b7280; }
-      * { box-sizing: border-box; }
-      body {
-        font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        color: #1a1a1a; margin: 0; background: #f4f6f8;
+      :root {
+        --bg: #f5f7fb;
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e6eaf1;
+        --accent: #4f46e5;
+        --accent-2: #2563eb;
+        --card: #ffffff;
       }
-      .page { max-width: 880px; margin: 0 auto; padding: 28px 20px 80px; }
-      header h1 { margin: 0 0 4px; font-size: 28px; }
-      header p { margin: 0 0 24px; color: var(--muted); }
-      .section { margin-top: 36px; }
-      .section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 4px; }
-      .section .desc { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
-      .section .desc code { background: #e8ebee; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
-      .editor-host { background: #fff; border-radius: 10px; }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      a { color: var(--accent-2); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+      /* Hero */
+      .hero {
+        position: relative;
+        text-align: center;
+        padding: 72px 20px 60px;
+        background:
+          radial-gradient(60% 120% at 50% -10%, rgba(79, 70, 229, 0.14), transparent 60%),
+          linear-gradient(180deg, #eef1fb 0%, var(--bg) 100%);
+        border-bottom: 1px solid var(--line);
+      }
+      .pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+      .pill {
+        font-size: 12px; font-weight: 600; color: var(--muted);
+        background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
+      }
+      .pill b { color: var(--accent); }
+      .hero h1 { font-size: 46px; line-height: 1.05; margin: 0 0 14px; letter-spacing: -0.02em; }
+      .hero h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .hero .tagline { font-size: 18px; color: var(--muted); max-width: 620px; margin: 0 auto 26px; }
+      .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: 15px;
+        border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer;
+      }
+      .btn:hover { text-decoration: none; border-color: #cdd4e2; }
+      .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(79, 70, 229, 0.28); }
+      .btn.primary:hover { background: #4338ca; }
+      .install { margin-top: 22px; }
+      .install code {
+        display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+        background: #0f172a; color: #cbd5e1; padding: 10px 14px; border-radius: 10px;
+      }
+      .install code b { color: #a5b4fc; }
+
+      /* Feature grid */
+      .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 40px 0 8px; }
+      @media (max-width: 760px) { .features { grid-template-columns: repeat(2, 1fr); } }
+      .feature { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+      .feature .ico {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 42px; height: 42px; border-radius: 11px;
+        background: rgba(79, 70, 229, 0.1); color: var(--accent);
+      }
+      .feature .ico svg { width: 23px; height: 23px; }
+      .feature h3 { margin: 12px 0 3px; font-size: 15px; }
+      .feature p { margin: 0; font-size: 13px; color: var(--muted); }
+
+      /* Editor sections */
+      .section { margin: 44px 0; }
+      .section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+      .section-head h2 { font-size: 20px; margin: 0; }
+      .section-head .tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; background: var(--accent); padding: 3px 9px; border-radius: 999px; }
+      .section-head .tag.alt { background: #0ea5e9; }
+      .section > .desc { margin: -8px 0 14px; color: var(--muted); }
+      .section > .desc code { background: #e8ebf1; padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+      .editor-card {
+        border-radius: 14px; overflow: hidden; background: var(--card);
+        box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08); border: 1px solid var(--line);
+      }
+      .editor-card .kontex { border: none; border-radius: 0; }
+
+      /* Documentation */
+      .docs { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 30px; margin: 44px 0; }
+      .docs h2 { font-size: 22px; margin: 0 0 6px; }
+      .docs .lead { color: var(--muted); margin: 0 0 22px; }
+      .docs h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); margin: 26px 0 10px; }
+      .docs pre { background: #0f172a; color: #dbe4f0; border-radius: 10px; padding: 14px 16px; overflow: auto; font-size: 13px; line-height: 1.6; margin: 0 0 8px; }
+      .docs pre code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre; }
+      .docs p { margin: 0 0 10px; }
+      .docs table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 4px 0 8px; }
+      .docs th, .docs td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      .docs th { color: var(--muted); font-weight: 600; }
+      .docs code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .docs td code, .docs p code, .docs li code { background: #eef1f6; padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
+      .docs .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      @media (max-width: 700px) { .docs .cols { grid-template-columns: 1fr; } }
+      .docs .note { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; color: #7c2d12; margin-top: 6px; }
+
+      /* Footer */
+      footer { border-top: 1px solid var(--line); margin-top: 60px; padding: 28px 20px 48px; color: var(--muted); font-size: 14px; }
+      footer .wrap { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+      footer a { font-weight: 600; }
     </style>
   </head>
   <body>
-    <div class="page">
-      <header>
-        <h1>KontexEditor</h1>
-        <p>A lightweight, embeddable rich-text editor — the same core, two configurations.</p>
-      </header>
+    <!-- Hero -->
+    <div class="hero">
+      <div class="pills">
+        <span class="pill"><b>~167 KB</b> gzipped</span>
+        <span class="pill">MIT licensed</span>
+        <span class="pill">Built on TipTap</span>
+        <span class="pill">Zero-config <b>&lt;script&gt;</b></span>
+      </div>
+      <h1>Kontex<span>Editor</span></h1>
+      <p class="tagline">A lightweight, embeddable rich-text editor with a CKEditor-style UX — a leaner alternative to CKEditor&nbsp;5.</p>
+      <div class="cta">
+        <a class="btn primary" href="#full">Try the editor ↓</a>
+        <a class="btn" href="#docs">Documentation</a>
+        <a class="btn" href="https://github.com/KontexAI/KontexEditor" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+      <div class="install"><code>&lt;script src="<b>kontex-editor.umd.cjs</b>"&gt;&lt;/script&gt;</code></div>
+    </div>
 
-      <section class="section">
-        <h2>Full editor</h2>
-        <p class="desc">The complete toolbar with every feature enabled — the default setup.</p>
-        <div class="editor-host"><div id="editor"></div></div>
+    <div class="wrap">
+      <!-- Feature highlights -->
+      <div class="features">
+        <div class="feature">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg></div>
+          <h3>Lightweight</h3><p>One self-contained script. CSS injected at runtime — nothing else to load.</p>
+        </div>
+        <div class="feature">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg></div>
+          <h3>Embeddable</h3><p>Binds to a &lt;textarea&gt; so normal form submits just work. ESM for bundlers.</p>
+        </div>
+        <div class="feature">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg></div>
+          <h3>Customizable</h3><p>Pick exactly the toolbar tools you need — from full-featured to minimal.</p>
+        </div>
+        <div class="feature">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg></div>
+          <h3>Full-featured</h3><p>Tables, images, spell-check, find &amp; replace, format painter, and more.</p>
+        </div>
+      </div>
+
+      <!-- Full editor -->
+      <section class="section" id="full">
+        <div class="section-head">
+          <span class="tag">Full</span>
+          <h2>The complete editor</h2>
+        </div>
+        <p class="desc">Every feature enabled — the default toolbar. Try a table, drop in an image, run spell-check, or go full-screen.</p>
+        <div class="editor-card"><div id="editor"></div></div>
       </section>
 
-      <section class="section">
-        <h2>Minimal editor</h2>
-        <p class="desc">The same editor with a trimmed <code>toolbar</code> — fully customizable.</p>
-        <div class="editor-host"><div id="editor-min"></div></div>
+      <!-- Minimal editor -->
+      <section class="section" id="minimal">
+        <div class="section-head">
+          <span class="tag alt">Minimal</span>
+          <h2>The same editor, trimmed down</h2>
+        </div>
+        <p class="desc">Just a few tools via the <code>toolbar</code> option — proof that it's fully customizable.</p>
+        <div class="editor-card"><div id="editor-min"></div></div>
+      </section>
+
+      <!-- Documentation -->
+      <section class="docs" id="docs">
+        <h2>Documentation</h2>
+        <p class="lead">Everything you need to drop KontexEditor into your app. For framework wrappers (React / Vue / Svelte) and advanced topics, see the full <a href="https://github.com/KontexAI/KontexEditor/blob/main/INTEGRATION.md">Integration Guide</a>.</p>
+
+        <h3>Install</h3>
+        <div class="cols">
+          <div>
+            <p>Plain <code>&lt;script&gt;</code> — UMD, no build step:</p>
+            <pre><code>&lt;script src="kontex-editor.umd.cjs"&gt;&lt;/script&gt;
+&lt;script&gt;
+  KontexEditor.create('#editor');
+&lt;/script&gt;</code></pre>
+          </div>
+          <div>
+            <p>npm / bundler — ESM:</p>
+            <pre><code>npm install kontex-editor</code></pre>
+            <pre><code>import { create } from 'kontex-editor';</code></pre>
+          </div>
+        </div>
+
+        <h3>Quick start</h3>
+        <pre><code>const editor = await KontexEditor.create('#editor', {
+  content: '&lt;p&gt;Hello world&lt;/p&gt;',
+  placeholder: 'Start typing…',
+  onChange: (html) =&gt; save(html),
+});</code></pre>
+        <p>Bind to a <code>&lt;textarea&gt;</code> and it stays in sync — a normal form submit posts the HTML. Any other element is mounted into.</p>
+
+        <h3>Options</h3>
+        <table>
+          <thead><tr><th>Option</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>content</code></td><td><code>string</code></td><td>Initial HTML (falls back to the textarea's value).</td></tr>
+            <tr><td><code>placeholder</code></td><td><code>string</code></td><td>Shown when empty.</td></tr>
+            <tr><td><code>editable</code></td><td><code>boolean</code></td><td>Start editable (default) or read-only.</td></tr>
+            <tr><td><code>toolbar</code></td><td><code>ToolbarItem[]</code></td><td>Custom toolbar layout; <code>[]</code> hides it.</td></tr>
+            <tr><td><code>upload</code></td><td><code>{ url } | fn</code></td><td>Image upload handler.</td></tr>
+            <tr><td><code>spellcheck</code></td><td><code>boolean</code></td><td>Dictionary spell-checker (lazy-loaded).</td></tr>
+            <tr><td><code>templates</code></td><td><code>TemplateDef[]</code></td><td>Blocks for the Templates menu.</td></tr>
+            <tr><td><code>autosave</code></td><td><code>{ key, restore? }</code></td><td>Persist to <code>localStorage</code>.</td></tr>
+            <tr><td><code>onChange</code></td><td><code>(html, editor)</code></td><td>Fires on every change.</td></tr>
+            <tr><td><code>onReady / onFocus / onBlur</code></td><td><code>(editor)</code></td><td>Lifecycle callbacks.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instance API</h3>
+        <pre><code>editor.getHTML();          // current content as HTML (store this)
+editor.setHTML(html);      // replace content
+editor.getJSON();          // TipTap document
+editor.getText();  editor.isEmpty();
+editor.focus();    editor.blur();
+editor.setEditable(bool);  // toggle read-only
+editor.destroy();          // unmount, restore the original element
+editor.tiptap;             // underlying TipTap Editor (advanced use)</code></pre>
+
+        <h3>Custom toolbar</h3>
+        <pre><code>KontexEditor.create('#editor', {
+  toolbar: ['bold', 'italic', '|', 'bulletList', 'link', '|', 'undo', 'redo'],
+});</code></pre>
+        <p>Items include <code>heading</code>, <code>fontFamily</code>, <code>fontSize</code>, <code>bold</code>, <code>italic</code>, <code>underline</code>, <code>fontColor</code>, <code>highlight</code>, <code>align</code>, lists, <code>indent</code>/<code>outdent</code>, <code>link</code>, <code>image</code>, <code>media</code>, <code>table</code>, <code>findReplace</code>, <code>spellcheck</code>, <code>fullscreen</code>, <code>source</code>, and <code>|</code> (separator).</p>
+
+        <h3>Image uploads</h3>
+        <pre><code>// Endpoint: POSTs multipart form-data; respond with { url } | { location } | string
+upload: { url: '/api/upload' },
+
+// …or a custom function (S3, signed URLs, etc.):
+upload: async (file) =&gt; (await myUploader(file)).url,</code></pre>
+
+        <h3>Autosave</h3>
+        <pre><code>autosave: { key: 'draft:article-42', restore: true },</code></pre>
+
+        <h3>Framework integration</h3>
+        <p>Ready-to-copy components for <strong>React</strong>, <strong>Vue&nbsp;3</strong>, <strong>Svelte</strong>, and server-rendered forms are in the <a href="https://github.com/KontexAI/KontexEditor/blob/main/INTEGRATION.md">Integration Guide</a>. The pattern: create on mount, call <code>destroy()</code> on unmount, and treat it as an uncontrolled input.</p>
+
+        <div class="note">⚠️ <strong>Security:</strong> <code>getHTML()</code> returns raw user HTML — always sanitize it on the server (allowlist) before storing or rendering it elsewhere. The paste cleanup is a UX nicety, not a security boundary.</div>
       </section>
     </div>
+
+    <footer>
+      <div class="wrap">
+        <span>KontexEditor · MIT licensed · <a href="https://github.com/KontexAI/KontexEditor" target="_blank" rel="noopener">GitHub</a> · Built on <a href="https://tiptap.dev" target="_blank" rel="noopener">TipTap</a></span>
+        <span>Everything on this page is live and editable.</span>
+      </div>
+    </footer>
 
     <script src="https://betamsg.carecoll.com/static/mail/kontex-editor.umd.cjs"></script>
     <script>
@@ -83,7 +296,7 @@
 
         <h2>Images with captions</h2>
         <figure class="kontex-figure">
-          <img src="https://placehold.co/520x220/2563eb/ffffff?text=Resizable+Image" width="520">
+          <img src="https://placehold.co/520x220/4f46e5/ffffff?text=Resizable+Image" width="520">
           <figcaption>Drag the corner handle to resize · click here to edit the caption</figcaption>
         </figure>
 
