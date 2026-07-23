@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KontexEditor — try it</title>
+    <meta name="description" content="A lightweight, embeddable rich-text editor built on TipTap. Try it here." />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      .wrap { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
+      .intro { margin: 0 0 14px; }
+      .intro h1 { font-size: 19px; margin: 0 0 4px; }
+      .intro p { margin: 0; color: #555; font-size: 14px; }
+      .intro a { color: #2563eb; }
+      .note { margin: 10px 0 26px; color: #666; font-size: 13px; }
+      pre {
+        background: #f4f6f8; border: 1px solid #e3e7ec; border-radius: 6px;
+        padding: 12px 14px; overflow: auto; font-size: 13px; line-height: 1.5; margin: 0 0 8px;
+      }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      h2 { font-size: 15px; margin: 34px 0 8px; }
+      footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #e3e7ec; color: #666; font-size: 13px; }
+      footer a { color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="intro">
+        <h1>KontexEditor</h1>
+        <p>
+          A rich-text editor you embed with one script tag. Built on TipTap/ProseMirror, MIT licensed.
+          <a href="https://github.com/KontexAI/KontexEditor" target="_blank" rel="noopener">Source on GitHub</a>.
+        </p>
+      </div>
+
+      <!-- The editor is the first thing on the page — everything below is editable. -->
+      <div id="editor"></div>
+
+      <p class="note">
+        Everything above is live. Try the tables (drag the borders), drop in an image, use the format
+        painter, or turn on spell-check from the toolbar.
+      </p>
+
+      <h2>Embedding it</h2>
+      <pre><code>&lt;textarea name="body"&gt;&lt;/textarea&gt;
+
+&lt;script src="kontex-editor.umd.cjs"&gt;&lt;/script&gt;
+&lt;script&gt;
+  KontexEditor.create('textarea[name=body]');
+  // the textarea is hidden and kept in sync, so normal form submits work
+&lt;/script&gt;</code></pre>
+
+      <h2>Trimming the toolbar</h2>
+      <pre><code>KontexEditor.create('#editor', {
+  toolbar: ['bold', 'italic', '|', 'bulletList', 'link', '|', 'undo', 'redo'],
+});</code></pre>
+      <div id="editor-min"></div>
+
+      <footer>
+        MIT licensed ·
+        <a href="https://github.com/KontexAI/KontexEditor" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://github.com/KontexAI/KontexEditor/blob/main/INTEGRATION.md" target="_blank" rel="noopener">Integration guide</a>
+      </footer>
+    </div>
+
+    <script src="https://kontexai.github.io/KontexEditor/dist/kontex-editor.umd.cjs"></script>
+    <script>
+      const DEMO_HTML = `
+        <h2>Rich text</h2>
+        <p>You get <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strikethrough</s>,
+          <span style="color: rgb(230, 0, 0)">colour</span>,
+          <mark data-color="#fff3a3" style="background-color: rgb(255, 243, 163)">highlight</mark>,
+          <code>inline code</code>, and <sub>sub</sub>/<sup>super</sup>script — H<sub>2</sub>O, E = mc<sup>2</sup>.</p>
+        <p>Lists, quotes and alignment work as you'd expect:</p>
+        <ul><li>Bullet lists</li><li>with items</li></ul>
+        <blockquote><p>Blockquotes look like this.</p></blockquote>
+
+        <h2>Tables — drag the borders to resize</h2>
+        <table>
+          <tbody>
+            <tr><th>Feature</th><th>Supported</th></tr>
+            <tr><td>Column &amp; row resize</td><td>Yes</td></tr>
+            <tr><td>Floating row/column controls</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Images — resize and caption them</h2>
+        <figure class="kontex-figure">
+          <img src="https://placehold.co/460x180/e2e8f0/475569?text=Drag+the+corner+to+resize" width="460">
+          <figcaption>Click here to edit the caption</figcaption>
+        </figure>
+        <p>Spell-check, find &amp; replace, templates and source view are in the toolbar.</p>
+      `;
+
+      KontexEditor.create('#editor', {
+        content: DEMO_HTML,
+        placeholder: 'Start typing…',
+        upload: (file) => Promise.resolve(URL.createObjectURL(file)),
+      });
+
+      KontexEditor.create('#editor-min', {
+        content: '<p>The same editor with only a few tools enabled.</p>',
+        placeholder: 'Write something…',
+        toolbar: ['bold', 'italic', '|', 'bulletList', 'link', '|', 'undo', 'redo'],
+      });
+    </script>
+  </body>
+</html>

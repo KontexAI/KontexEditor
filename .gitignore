@@ -1,5 +1,10 @@
 node_modules/
-dist/
+
+# Ignore build output, except the UMD bundle the demo pages load from GitHub Pages.
+# (Must use dist/* — git can't re-include a file whose parent directory is excluded.)
+dist/*
+!dist/kontex-editor.umd.cjs
+
 .playwright-mcp/
 *.log
 .DS_Store
