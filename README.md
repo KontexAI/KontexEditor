@@ -63,9 +63,9 @@ already know, while shipping a **much smaller, self-contained** editor under the
 - **Spell check** — dictionary-backed (Hunspell via `nspell`) with red underlines and a
   custom right-click suggestion menu. The dictionary is **lazy-loaded** on first use, so
   it costs nothing until enabled.
-- **Productivity** — find & replace, templates/snippets menu, special-character & emoji
-  picker, source/HTML view, **Word/Office paste cleanup**, full-screen mode, live
-  word/char count.
+- **Productivity** — **slash (`/`) command menu** for inserting blocks at the caret,
+  find & replace, templates/snippets menu, special-character & emoji picker, source/HTML
+  view, **Word/Office paste cleanup**, full-screen mode, live word/char count.
 - **Comfort** — **autosave to `localStorage`** with a "Saved" indicator, read-only mode,
   fast custom tooltips.
 
@@ -143,6 +143,8 @@ editor.destroy();        // tear down
 | `content` | `string` | Initial HTML. Falls back to the textarea's value / element HTML. |
 | `placeholder` | `string` | Placeholder shown when empty. |
 | `editable` | `boolean` | Start editable (default `true`) or read-only. |
+| `stickyToolbar` | `boolean` | Pin the toolbar to the top while scrolling long content (default `false`). |
+| `slashMenu` | `boolean` | Enable the `/` slash command menu for inserting blocks (default `true`). |
 | `toolbar` | `ToolbarItem[]` | Custom toolbar layout. `[]` hides the toolbar. |
 | `upload` | `{ url, fieldName? }` \| `(file) => Promise<string>` | Image upload handler. Omit to disable uploads (URL embed still works). |
 | `spellcheck` | `boolean` | Start with the dictionary spell-checker on (default `false`; toggle from the toolbar). |

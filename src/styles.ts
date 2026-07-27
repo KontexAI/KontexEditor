@@ -36,6 +36,11 @@ body.kontex-fullscreen-lock { overflow: hidden; }
   background: #fafafa;
   border-radius: 4px 4px 0 0;
 }
+.kontex__toolbar--sticky {
+  position: sticky;
+  top: var(--kontex-sticky-top, 0px);
+  z-index: 30;
+}
 .kontex__btn {
   display: inline-flex;
   align-items: center;
@@ -300,6 +305,52 @@ body.kontex-fullscreen-lock { overflow: hidden; }
 .kontex-spellmenu__suggest { font-weight: 600; }
 .kontex-spellmenu__none { padding: 6px 10px; color: #999; font-size: 13px; }
 .kontex-spellmenu__sep { height: 1px; margin: 4px 2px; background: #e8eaed; }
+
+/* Slash command menu */
+.kontex-slash {
+  position: fixed;
+  z-index: 10000;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #d8dce1;
+  border-radius: 9px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.kontex-slash__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 9px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.kontex-slash__item.is-active { background: #eef0f3; }
+.kontex-slash__ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #f1f3f6;
+  border: 1px solid #e6eaef;
+  color: #3a3f47;
+  font-size: 12px;
+  font-weight: 700;
+}
+.kontex-slash__ico svg { width: 17px; height: 17px; }
+.kontex-slash__text { display: flex; flex-direction: column; min-width: 0; }
+.kontex-slash__title { font-size: 13.5px; font-weight: 600; color: #1a1a1a; }
+.kontex-slash__desc { font-size: 11.5px; color: #8a9099; }
 
 /* Footer autosave indicator */
 .kontex__footer-status { color: #2f9e5e; }

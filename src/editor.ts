@@ -13,6 +13,8 @@ import { ResizableImage } from './extensions/resizable-image';
 import { TableRowResize } from './extensions/table-row-resize';
 import { SearchReplace } from './extensions/search-replace';
 import { Iframe, normalizeEmbedUrl } from './extensions/iframe';
+import { SlashCommand, type SlashItem } from './extensions/slash-command';
+import { icon } from './icons';
 import { cleanPastedHTML } from './paste-cleanup';
 import { Spellcheck, type SpellcheckStorage } from './spellcheck/spellcheck';
 import { loadSpellEngine, DEFAULT_DICTIONARY, type DictionarySource } from './spellcheck/engine';
@@ -154,6 +156,7 @@ class KontexEditor implements KontexEditorInstance {
         SearchReplace,
         Iframe,
         Spellcheck,
+        ...(opts.slashMenu === false ? [] : [SlashCommand.configure({ items: this.slashItems() })]),
       ],
       editorProps: {
         // Native spellcheck off — the custom dictionary-backed checker provides
@@ -214,7 +217,10 @@ class KontexEditor implements KontexEditorInstance {
         })
       : null;
 
-    if (this.toolbar) this.root.appendChild(this.toolbar.el);
+    if (this.toolbar) {
+      if (opts.stickyToolbar) this.toolbar.el.classList.add('kontex__toolbar--sticky');
+      this.root.appendChild(this.toolbar.el);
+    }
     this.root.appendChild(this.contentEl);
     this.root.appendChild(this.footerEl);
 
@@ -424,6 +430,24 @@ class KontexEditor implements KontexEditorInstance {
       }
       this.tiptap.chain().focus().setImage({ src }).run();
     }
+  }
+
+  /** Default command set for the "/" slash menu. */
+  private slashItems(): SlashItem[] {
+    const H = (n: string) => `<b>${n}</b>`;
+    return [
+      { title: 'Heading 1', description: 'Large section heading', icon: H('H1'), keywords: ['h1', 'title'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run() },
+      { title: 'Heading 2', description: 'Medium section heading', icon: H('H2'), keywords: ['h2'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run() },
+      { title: 'Heading 3', description: 'Small section heading', icon: H('H3'), keywords: ['h3'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run() },
+      { title: 'Bullet list', description: 'Simple bulleted list', icon: icon('bulletList'), keywords: ['ul', 'unordered', 'bullet'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).toggleBulletList().run() },
+      { title: 'Numbered list', description: 'Ordered list', icon: icon('orderedList'), keywords: ['ol', 'ordered', 'number'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).toggleOrderedList().run() },
+      { title: 'Quote', description: 'Blockquote', icon: icon('blockquote'), keywords: ['blockquote', 'citation'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).toggleBlockquote().run() },
+      { title: 'Code block', description: 'Preformatted code', icon: icon('source'), keywords: ['code', 'pre'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).toggleCodeBlock().run() },
+      { title: 'Divider', description: 'Horizontal rule', icon: icon('horizontalRule'), keywords: ['hr', 'separator', 'line'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setHorizontalRule().run() },
+      { title: 'Table', description: 'Insert a 3×3 table', icon: icon('table'), keywords: ['grid'], command: ({ editor, range }) => editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
+      { title: 'Image', description: 'Upload or embed an image', icon: icon('image'), keywords: ['picture', 'photo'], command: ({ editor, range }) => { editor.chain().focus().deleteRange(range).run(); this.insertImage(); } },
+      { title: 'Media embed', description: 'YouTube, Vimeo, or iframe', icon: icon('media'), keywords: ['video', 'youtube', 'iframe'], command: ({ editor, range }) => { editor.chain().focus().deleteRange(range).run(); this.insertMedia(); } },
+    ];
   }
 
   private insertMedia(): void {

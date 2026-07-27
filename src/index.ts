@@ -7,5 +7,6 @@ export type {
   UploadOption,
   TemplateDef,
 } from './types';
+export type { SlashItem } from './extensions/slash-command';
 
 export const version = '0.1.0';

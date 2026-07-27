@@ -62,6 +62,12 @@ export interface KontexOptions {
   placeholder?: string;
   /** Start editable (true) or read-only (false). Default true. */
   editable?: boolean;
+  /** Keep the toolbar pinned to the top while scrolling long content. Default false.
+   *  Uses `position: sticky`; for a page with a fixed header, set the CSS variable
+   *  `--kontex-sticky-top` on the editor element to offset it. */
+  stickyToolbar?: boolean;
+  /** Enable the "/" slash command menu for inserting blocks at the caret. Default true. */
+  slashMenu?: boolean;
   /** Start with the (dictionary-backed) spell checker enabled. Default false — users
    *  toggle it from the toolbar, which lazy-loads the dictionary on first use. */
   spellcheck?: boolean;

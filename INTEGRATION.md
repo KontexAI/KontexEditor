@@ -125,6 +125,8 @@ Pass as the second argument to `create(target, options)`.
 | `content` | `string` | textarea value / element HTML | Initial HTML. |
 | `placeholder` | `string` | `''` | Placeholder shown when empty. |
 | `editable` | `boolean` | `true` | `false` = read-only. |
+| `stickyToolbar` | `boolean` | `false` | Pin the toolbar to the top while scrolling long content. |
+| `slashMenu` | `boolean` | `true` | Enable the `/` slash command menu for inserting blocks at the caret. |
 | `toolbar` | `ToolbarItem[]` | full set | Custom layout; `[]` hides the toolbar. |
 | `upload` | `{ url, fieldName? }` \| `(file) => Promise<string>` | — | Image upload handling. |
 | `spellcheck` | `boolean` | `false` | Start with the dictionary spell-checker on. |
